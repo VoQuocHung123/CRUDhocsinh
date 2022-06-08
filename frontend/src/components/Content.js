@@ -7,8 +7,8 @@ export default function Content() {
   const [isEditingUpdate,setIsEditingUpdate] = useState('modal')
   const [isEditingAdd,setIsEditingAdd] = useState('modal')
   const [editingStudent,setEditingStudent] = useState({firstname:"",lastname:"",age:"",class:"",avatar:""})
-  // const [validate,setValidate] = useState({firstname:false,lastname:false,age:false,class:false,img:false})
   const [dataStudent,setDataStudent] = useState([])
+  const [previewImage,setPreviewImage] = useState()
   useEffect(()=>{
     callStudent()
   },[])
@@ -61,18 +61,19 @@ export default function Content() {
             </tr>
         </thead>
         <tbody>
-        {dataStudent.map((student,index)=>{
+        {dataStudent.length === 0? <div style={{margin: 10 ,fontWeight:"bold",color: "red"}}>Không có dữ liệu</div> : dataStudent.map((student,index)=>{
         return <Student key={index} dataSource={student} onUpdate={updateStudent} onDelete={deleteStudent} ></Student>
       })}
         </tbody>
       </table>
       {/* Update Student*/}
       <FormFeature
-      title="Update Sinh Viên"
+      title="Update Học Sinh"
       visible={isEditingUpdate}
       onCancel={()=>{
         setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
         setIsEditingUpdate('modal')
+        setPreviewImage()
       }}
       onOk={()=>{
         const API = `http://localhost:3001/update-student/${editingStudent._id}`
@@ -92,6 +93,7 @@ export default function Content() {
           })
           )
           .then((data)=>setDataStudent(data))
+          setPreviewImage()
           setIsEditingUpdate('modal')
         }
       }
@@ -119,9 +121,10 @@ export default function Content() {
           return {...prev,class:e.target.value}
         })
       }}
-      avatar={editingStudent?.avatar}
+      avatar={previewImage?previewImage:"http://localhost:3001/avatar/"+editingStudent?.avatar}
       onChangeAvt={(e)=>{
         setEditingStudent(prev=>{
+          setPreviewImage(URL.createObjectURL(e.target.files[0]))
           const file = e.target.files[0]
           return {...prev,avatar:file}
         })
@@ -130,11 +133,12 @@ export default function Content() {
       </FormFeature>
       {/* Add Student */}
       <FormFeature
-      title="Add Sinh Viên"
+      title="Add Học Sinh"
       visible={isEditingAdd}
       onCancel={()=>{
         setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
         setIsEditingAdd('modal')
+        setPreviewImage()
       }}
       onOk={()=>{
           const API = "http://localhost:3001/add-student"
@@ -147,6 +151,7 @@ export default function Content() {
         .then((data)=>setDataStudent([...dataStudent,data]))
         .catch(console.error)          
         setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
+        setPreviewImage()
         setIsEditingAdd('modal')
       }
       }
@@ -174,8 +179,9 @@ export default function Content() {
           return {...prev,class:e.target.value}
         })
       }}
-      avatar={editingStudent?.avatar}
+      avatar={previewImage}
       onChangeAvt={(e)=>{
+        setPreviewImage(URL.createObjectURL(e.target.files[0]))
         setEditingStudent(prev=>{
           const file = e.target.files[0]
           return {...prev,avatar:file}

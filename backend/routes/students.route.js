@@ -4,7 +4,7 @@ const multer = require('multer')
 
 const multerConfig = multer.diskStorage({
     destination :(req,file,callback)=>{
-        callback(null,'./upload/')
+        callback(null,'./public/avatar/')
     },
     filename: (req,file,callback)=>{
         const ext = file.mimetype.split('/')[1]

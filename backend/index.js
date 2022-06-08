@@ -8,7 +8,7 @@ const path = require('path')
 
 app.use(morgan('combined'))
 route(app)
-app.use(express.static(path.join(__dirname,'upload')))
+app.use(express.static(path.join(__dirname,'/public/')))
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
