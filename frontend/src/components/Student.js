@@ -4,7 +4,6 @@ export default function Student(props) {
 
   return (
     <>
-     
         <tr className='table-item'>
             <td>{props.dataSource.firstname}</td>
             <td>{props.dataSource.lastname}</td>
@@ -14,7 +13,6 @@ export default function Student(props) {
             <td><button className="btn-update" onClick={()=>props.onUpdate(props.dataSource)}>Update</button></td>
             <td><button className="btn-delete" onClick={()=>props.onDelete(props.dataSource)}>Delete</button></td>
         </tr>
-      
     </>
   )
 }

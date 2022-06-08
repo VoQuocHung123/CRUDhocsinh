@@ -9,6 +9,7 @@ export default function Content() {
   const [editingStudent,setEditingStudent] = useState({firstname:"",lastname:"",age:"",class:"",avatar:""})
   const [dataStudent,setDataStudent] = useState([])
   const [previewImage,setPreviewImage] = useState()
+  const [errors,setErrors] = useState({})
   useEffect(()=>{
     callStudent()
   },[])
@@ -38,13 +39,78 @@ export default function Content() {
     })
   }
 
-  async function callStudent(){
+  const callStudent=()=>{
     const API ="http://localhost:3001/students"
     axios.get(API)
     .then(response=>response.data)
     .then(data=>setDataStudent(data))
     .catch(err=>console.log(err))
   }
+  const handleChange = (e)=>{
+    const {name,value} = e.target
+    setEditingStudent({...editingStudent,[name]:value})
+
+  }
+  const handleAddSubmit=()=>{
+    setErrors(validate(editingStudent))
+    if(Object.keys(errors).length === 0){
+      const API = "http://localhost:3001/add-student"
+      const formData= new FormData()
+      for(let name in editingStudent){
+        formData.append(name,editingStudent[name])
+      }
+      axios.post(API,formData)
+      .then(response=> response.data)
+      .then((data)=>setDataStudent([...dataStudent,data]))
+      .catch(console.error)
+    }          
+      setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
+      setPreviewImage()
+      setIsEditingAdd('modal')
+  }
+  const handleUpdateSubmit=()=>{
+    const API = `http://localhost:3001/update-student/${editingStudent._id}`
+    const formData= new FormData()
+    for(let name in editingStudent){
+      formData.append(name,editingStudent[name])
+    }
+    axios
+      .put(API,formData)
+      .then(response=>response.data)
+      .then(data=> dataStudent.map(student=>{
+        if(student._id === data._id){
+          return data
+        }else{
+          return student
+        }
+      })
+      )
+      .then((data)=>setDataStudent(data))
+      setPreviewImage()
+      setIsEditingUpdate('modal')
+  }
+  const validate = (values)=>{
+    console.log(values)
+    const err = {};
+    if(!values.firstname){
+      err.firstname = "Vui lòng nhập vào firstname"
+    }
+    if(!values.lastname){
+      err.lastname = "Vui lòng nhập vào lastname"
+    }
+    if(!values.age || typeof(values.age) === "string"){
+      err.age = "Vui lòng nhập vào số tuổi "
+    }
+    if(!values.class){
+      err.class = "Vui lòng nhập vào tên lớp"
+    }
+    if(!values.avatar){
+      err.avatar = "Vui lòng thêm ảnh"
+    }
+    return err
+
+  }
+
 
   return (
     <div className='content'>
@@ -76,51 +142,14 @@ export default function Content() {
         setPreviewImage()
       }}
       onOk={()=>{
-        const API = `http://localhost:3001/update-student/${editingStudent._id}`
-        const formData= new FormData()
-        for(let name in editingStudent){
-          formData.append(name,editingStudent[name])
-        }
-        axios
-          .put(API,formData)
-          .then(response=>response.data)
-          .then(data=> dataStudent.map(student=>{
-            if(student._id === data._id){
-              return data
-            }else{
-              return student
-            }
-          })
-          )
-          .then((data)=>setDataStudent(data))
-          setPreviewImage()
-          setIsEditingUpdate('modal')
+        handleUpdateSubmit()
         }
       }
+      onChangeInput={handleChange}
       firstname={editingStudent?.firstname}
-      onChangeFirstName={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,firstname:e.target.value}
-        })
-      }}
-      lastname={editingStudent?.lastname}
-      onChangeLastName={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,lastname:e.target.value}
-        })
-      }}
-      age={editingStudent?.age}
-      onChangeAge={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,age:e.target.value}
-        })
-      }}
-      class={editingStudent?.class}
-      onChangeClass={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,class:e.target.value}
-        })
-      }}
+      lastname={editingStudent?.lastname}  
+      age={editingStudent?.age}   
+      class={editingStudent?.class}  
       avatar={previewImage?previewImage:"http://localhost:3001/avatar/"+editingStudent?.avatar}
       onChangeAvt={(e)=>{
         setEditingStudent(prev=>{
@@ -141,45 +170,18 @@ export default function Content() {
         setPreviewImage()
       }}
       onOk={()=>{
-          const API = "http://localhost:3001/add-student"
-          const formData= new FormData()
-          for(let name in editingStudent){
-            formData.append(name,editingStudent[name])
-          }
-        axios.post(API,formData)
-        .then(response=> response.data)
-        .then((data)=>setDataStudent([...dataStudent,data]))
-        .catch(console.error)          
-        setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
-        setPreviewImage()
-        setIsEditingAdd('modal')
+  
+        handleAddSubmit()
+      
       }
       }
+      onChangeInput={handleChange}
       firstname={editingStudent?.firstname}
-      onChangeFirstName={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,firstname:e.target.value}
-        })
-      }}
       lastname={editingStudent?.lastname}
-      onChangeLastName={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,lastname:e.target.value}
-        })
-      }}
       age={editingStudent?.age}
-      onChangeAge={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,age:e.target.value}
-        })
-      }}
       class={editingStudent?.class}
-      onChangeClass={(e)=>{
-        setEditingStudent(prev =>{
-          return {...prev,class:e.target.value}
-        })
-      }}
       avatar={previewImage}
+      Errors={errors}
       onChangeAvt={(e)=>{
         setPreviewImage(URL.createObjectURL(e.target.files[0]))
         setEditingStudent(prev=>{
