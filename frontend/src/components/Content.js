@@ -13,7 +13,6 @@ export default function Content() {
   useEffect(()=>{
     callStudent()
   },[])
-
   const updateStudent = (record)=>{
     setIsEditingUpdate('modal active')
     setEditingStudent({...record})
@@ -38,7 +37,6 @@ export default function Content() {
       }
     })
   }
-
   const callStudent=()=>{
     const API ="http://localhost:3001/students"
     axios.get(API)
@@ -49,11 +47,10 @@ export default function Content() {
   const handleChange = (e)=>{
     const {name,value} = e.target
     setEditingStudent({...editingStudent,[name]:value})
-
   }
-  const handleAddSubmit=()=>{
+  const handleAddSubmit= ()=>{
     setErrors(validate(editingStudent))
-    if(Object.keys(errors).length === 0){
+    if(Object.keys(validate(editingStudent)).length === 0){
       const API = "http://localhost:3001/add-student"
       const formData= new FormData()
       for(let name in editingStudent){
@@ -63,12 +60,15 @@ export default function Content() {
       .then(response=> response.data)
       .then((data)=>setDataStudent([...dataStudent,data]))
       .catch(console.error)
-    }          
       setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
       setPreviewImage()
       setIsEditingAdd('modal')
-  }
+    }
+    else{ console.log("có lỗi")}     
+  } 
   const handleUpdateSubmit=()=>{
+    setErrors(validate(editingStudent))
+    if(Object.keys(validate(editingStudent)).length === 0){
     const API = `http://localhost:3001/update-student/${editingStudent._id}`
     const formData= new FormData()
     for(let name in editingStudent){
@@ -88,9 +88,9 @@ export default function Content() {
       .then((data)=>setDataStudent(data))
       setPreviewImage()
       setIsEditingUpdate('modal')
+    }else{console.log("Có Lỗi")}
   }
   const validate = (values)=>{
-    console.log(values)
     const err = {};
     if(!values.firstname){
       err.firstname = "Vui lòng nhập vào firstname"
@@ -98,20 +98,19 @@ export default function Content() {
     if(!values.lastname){
       err.lastname = "Vui lòng nhập vào lastname"
     }
-    if(!values.age || typeof(values.age) === "string"){
+    if(!values.age){
       err.age = "Vui lòng nhập vào số tuổi "
     }
     if(!values.class){
       err.class = "Vui lòng nhập vào tên lớp"
     }
     if(!values.avatar){
-      err.avatar = "Vui lòng thêm ảnh"
+      err.avatar = "vui lòng thêm ảnh"
     }
+    
+    console.log(err)
     return err
-
   }
-
-
   return (
     <div className='content'>
       <button className="btn-add" onClick={addStudent}>Thêm Học Sinh</button>
@@ -127,7 +126,7 @@ export default function Content() {
             </tr>
         </thead>
         <tbody>
-        {dataStudent.length === 0? <div style={{margin: 10 ,fontWeight:"bold",color: "red"}}>Không có dữ liệu</div> : dataStudent.map((student,index)=>{
+        {dataStudent.length === 0? <tr><td style={{padding: 10 ,fontWeight:"bold",color: "red"}}>Không có dữ liệu</td></tr> : dataStudent.map((student,index)=>{
         return <Student key={index} dataSource={student} onUpdate={updateStudent} onDelete={deleteStudent} ></Student>
       })}
         </tbody>
@@ -139,12 +138,14 @@ export default function Content() {
       onCancel={()=>{
         setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
         setIsEditingUpdate('modal')
+        setErrors({})
         setPreviewImage()
       }}
       onOk={()=>{
         handleUpdateSubmit()
         }
       }
+      Errors ={errors}
       onChangeInput={handleChange}
       firstname={editingStudent?.firstname}
       lastname={editingStudent?.lastname}  
@@ -167,12 +168,11 @@ export default function Content() {
       onCancel={()=>{
         setEditingStudent({firstname:"",lastname:"",age:"",class:"",avatar:""})
         setIsEditingAdd('modal')
+        setErrors({})
         setPreviewImage()
       }}
       onOk={()=>{
-  
         handleAddSubmit()
-      
       }
       }
       onChangeInput={handleChange}
@@ -189,7 +189,8 @@ export default function Content() {
           return {...prev,avatar:file}
         })
       }}
-      ></FormFeature>
+      >
+      </FormFeature>
     </div>
   )
 }
