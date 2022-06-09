@@ -45,6 +45,7 @@ export default function Content() {
     .catch(err=>console.log(err))
   }
   const handleChange = (e)=>{
+    setErrors({})
     const {name,value} = e.target
     setEditingStudent({...editingStudent,[name]:value})
   }
@@ -90,6 +91,14 @@ export default function Content() {
       setIsEditingUpdate('modal')
     }else{console.log("Có Lỗi")}
   }
+  const handleAvatar = (e)=>{
+    setErrors({})
+    setPreviewImage(URL.createObjectURL(e.target.files[0]))
+    setEditingStudent(prev=>{
+      const file = e.target.files[0]
+      return {...prev,avatar:file}
+    })
+  }
   const validate = (values)=>{
     const err = {};
     if(!values.firstname){
@@ -107,8 +116,6 @@ export default function Content() {
     if(!values.avatar){
       err.avatar = "vui lòng thêm ảnh"
     }
-    
-    console.log(err)
     return err
   }
   return (
@@ -153,11 +160,7 @@ export default function Content() {
       class={editingStudent?.class}  
       avatar={previewImage?previewImage:"http://localhost:3001/avatar/"+editingStudent?.avatar}
       onChangeAvt={(e)=>{
-        setEditingStudent(prev=>{
-          setPreviewImage(URL.createObjectURL(e.target.files[0]))
-          const file = e.target.files[0]
-          return {...prev,avatar:file}
-        })
+        handleAvatar(e)
       }}
       >
       </FormFeature>
@@ -183,11 +186,7 @@ export default function Content() {
       avatar={previewImage}
       Errors={errors}
       onChangeAvt={(e)=>{
-        setPreviewImage(URL.createObjectURL(e.target.files[0]))
-        setEditingStudent(prev=>{
-          const file = e.target.files[0]
-          return {...prev,avatar:file}
-        })
+        handleAvatar(e)
       }}
       >
       </FormFeature>
