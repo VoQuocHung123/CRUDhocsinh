@@ -1,37 +1,42 @@
 import React from 'react'
+import FormGroup from './FormGroup'
 export default function FormFeature(props) {
+  const handleAvatar = (e) => {
+    props.setErrors({})
+    props.setPreviewImage(URL.createObjectURL(e.target.files[0]))
+    props.setEditingStudent(prev => {
+      const file = e.target.files[0]
+      return { ...prev, avatar: file }
+    })
+  }
+  const handleChange = (e) => {
+    props.setErrors({})
+    const { name, value } = e.target
+    props.setEditingStudent({ ...props.editingStudent, [name]: value })
+  }
   return (
     <>
-    <div className={props.visible}>
+      <div className={props.visible?"modal active":"modal"}>
         <div className='modal-container' >
           <form encType="multipart/form-data" >
-          <span style={{float: 'right' ,color: 'white',fontWeight: 'bold' , padding: 20 , cursor :'pointer' }} className="btn-close" onClick={props.onCancel}>X</span>
-          <header className="modal-header">{props.title}</header>
-          <div className='form-body'>
-            <label>FirstName:</label>
-            <input value={props.firstname} type={'text'} name="firstname" className="form-input" onChange={props.onChangeInput} />
-            <div className='validation'>{props.Errors.firstname}</div>
-            <label>LastName:</label>
-            <input value={props.lastname} type={'text'} name="lastname" className="form-input" onChange={props.onChangeInput}/>
-            <div  className='validation'>{props.Errors.lastname}</div>
-            <label>Age:</label>
-            <input  value={props.age} type='text' name="age" className="form-input" onChange={event => {
-              (/^-?[\d.]+(?:e-?\d+)?$/.test(event.target.value)) ? props.onChangeInput(event) : event.preventDefault()
-              }} 
-            />
-            <div className='validation'>{props.Errors.age}</div>
-            <label>Class:</label>
-            <input value={props.class} type={'text'} name="class" className="form-input" onChange={props.onChangeInput} />
-            <div className='validation'>{props.Errors.class}</div>
-            <label>Avatar:</label>
-            <input type={'file'} style={{height: 40,width: 84,display: 'block', padding: 5}} name="avatar"  onChange={props.onChangeAvt} className="form-input" />
-            <div className='validation'>{props.Errors.avatar}</div>
-            <img alt='' src={props.avatar} style={{width : 70,display: 'block'}} ></img>
-            <button type='button' className="btn-add-form" onClick={e=>{ props.onOk()}}>Xác Nhận</button>      
-          </div>
+            <span style={{ float: 'right', color: 'white', fontWeight: 'bold', padding: 20, cursor: 'pointer' }} className="btn-close" onClick={props.onCancel} >X</span>
+            <header className="modal-header">{props.title}</header>
+            <div className='form-body'>
+              <FormGroup label="FirstName" type='text' value={props.editingStudent.firstname} name="firstname" onChange={e => handleChange(e)} validate={props.Errors.firstname}></FormGroup>
+              <FormGroup label="LastName" type='text' value={props.editingStudent.lastname} name="lastname" onChange={e => handleChange(e)} validate={props.Errors.lastname}></FormGroup>
+              <FormGroup label="Age" type='text' value={props.editingStudent.age} name="age" onChange={event => {
+                (/^-?[\d.]+(?:e-?\d+)?$/.test(event.target.value)) ? handleChange(event) : event.preventDefault()
+              }} validate={props.Errors.age}></FormGroup>
+              <FormGroup label="Class" type='text' value={props.editingStudent.classname} name="classname" onChange={e => handleChange(e)} validate={props.Errors.classname}></FormGroup>
+              <FormGroup label="Avatar" type='file' name="avatar" onChange={e => handleAvatar(e)} style={{ height: 40, width: 84, display: 'block', padding: 5 }} validate={props.Errors.avatar}></FormGroup>
+              <img alt='' src={props.previewImage ? props.previewImage : process.env.REACT_APP_API_URL+"/avatar/"+ props.editingStudent?.avatar} style={{ width: 70, display: 'block' }} ></img>
+              <button type='button' className="btn-add-form"
+                onClick={props.handleSubmit}
+              >Xác Nhận</button>
+            </div>
           </form>
         </div>
-    </div>
+      </div>
     </>
   )
 }

@@ -126,6 +126,31 @@ thead{
   color: red;
   font-size: 11px;
 }
+.pagination {
+  display: block;
+  width: 100%;
+  margin: 50px 270px 0px;
+}
+
+.pagination .child-pagi {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid #13b1e1;
+  border-radius: 5px;
+}
+
+.pagination .child-pagi.active {
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+}
+
+.pagination .child-pagi:hover:not(.active) {
+  background-color: #ddd;
+  border-radius: 5px;
+}
 @keyframes modalgo {
   from{
     opacity: 0;

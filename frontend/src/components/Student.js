@@ -1,17 +1,17 @@
 import React from 'react'
-
+import Button from './Button';
 export default function Student(props) {
-
+  const {firstname,lastname,age,classname,avatar} = props.dataSource 
   return (
     <>
         <tr className='table-item'>
-            <td>{props.dataSource.firstname}</td>
-            <td>{props.dataSource.lastname}</td>
-            <td>{props.dataSource.age}</td>
-            <td>{props.dataSource.class}</td>
-            <td><img alt='' src={"http://localhost:3001/avatar/"+props.dataSource.avatar} width="50px"></img></td>
-            <td><button className="btn-update" onClick={()=>props.onUpdate(props.dataSource)}>Update</button></td>
-            <td><button className="btn-delete" onClick={()=>props.onDelete(props.dataSource)}>Delete</button></td>
+            <td>{firstname}</td>
+            <td>{lastname}</td>
+            <td>{age}</td>
+            <td>{classname}</td>
+            <td><img alt='' src={process.env.REACT_APP_API_URL+"/avatar/"+avatar} width="50px"></img></td>
+            <td><Button title="Update" className="btn-update" onClick={()=>props.onUpdate(props.dataSource)} ></Button></td>
+            <td><Button title="Delete" className="btn-delete" onClick={()=>props.onDelete(props.dataSource)} ></Button></td>
         </tr>
     </>
   )
