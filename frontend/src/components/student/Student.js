@@ -1,5 +1,5 @@
 import React from 'react'
-import Button from './Button';
+import Button from '../button/Button';
 export default function Student(props) {
   const {firstname,lastname,age,classname,avatar} = props.dataSource 
   return (

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Modal } from 'antd'
-import FormFeature from '../components/FormFeature';
-import Student from '../components/Student';
-import studentApi from '../api/studentApi';
-import Button from '../components/Button';
-import { Link, useParams } from 'react-router-dom';
-import Pagination from '../components/Pagination';
+import FormFeature from '../../components/formFeature/FormFeature';
+import Student from '../../components/student/Student';
+import studentApi from '../../api/studentApi';
+import Button from '../../components/button/Button';
+import Pagination from '../../components/pagination/Pagination';
+import queryString from 'query-string'
 export default function StudentsManage() {
   const [activeForm, setActiveForm] = useState(false)
   const [editingStudent, setEditingStudent] = useState({ firstname: "", lastname: "", age: "", classname: "", avatar: "" })
@@ -13,24 +13,17 @@ export default function StudentsManage() {
   const [previewImage, setPreviewImage] = useState()
   const [errors, setErrors] = useState({})
   const [numOfPage, setNumOfPage] = useState([])
-  const params = useParams();
-  let page = +params.page
-  useEffect(() => {
-    console.log(params)
-    callStudent()
-  }, [])
-  useEffect(() => {
-    getStudentByPage()
-  }, [page])
+  const [pagination,setPagination] = useState({
+    page:1,
+    limit:3
+  })
 
-  const getStudentByPage = async () => {
-    try {
-      if (params.page === undefined) params.page = 1
-      const response = await studentApi.getbyPage(params.page)
-      setDataStudent(response.data)
-    } catch (err) {
-      console.log(err)
-    }
+  useEffect(() => {
+    callStudent()
+  }, [pagination])
+
+  const handlePageChange = async (newPage)=>{
+    setPagination({...pagination,page:newPage})
   }
   const updateStudent = (record) => {
     setActiveForm(true)
@@ -50,8 +43,6 @@ export default function StudentsManage() {
           setDataStudent(prev => {
             return prev.filter((student) => student._id !== id)
           })
-          getStudentByPage()
-          callStudent()
         }
         callDeleteStudent(record._id)
       }
@@ -59,14 +50,15 @@ export default function StudentsManage() {
   }
   const callStudent = async () => {
     try {
-      const response = await studentApi.getAll()
-      const lengthPages = Math.ceil(response.data.length / 2)
+      const query = queryString.stringify(pagination)
+      const response = await studentApi.getbyPage(query)
+      setDataStudent(response.data.student)
+      const lengthPages = Math.ceil(response.data.countStudent / pagination.limit)
       const arrNumPage = []
       for (let i = 1; i <= lengthPages; i++) {
         arrNumPage.push(i)
       }
       setNumOfPage(arrNumPage)
-      // setDataStudent(response.data)
     } catch (err) {
       console.log(err)
     }
@@ -79,7 +71,11 @@ export default function StudentsManage() {
         for (let name in editingStudent) {
           formData.append(name, editingStudent[name])
         }
+        for (const value of formData.values()) {
+          console.log(value);
+        }
         const response = await studentApi.putStudent(editingStudent._id, formData)
+        console.log(response.data)
         response.data = dataStudent.map(student => {
           if (student._id === response.data._id) {
             return response.data
@@ -88,7 +84,7 @@ export default function StudentsManage() {
           }
         })
         setDataStudent(response.data)
-        setPreviewImage()
+        setPreviewImage(null)
         setEditingStudent({ firstname: "", lastname: "", age: "", classname: "", avatar: "" })
         setActiveForm(false)
       } catch (err) {
@@ -131,7 +127,7 @@ export default function StudentsManage() {
       err.classname = "Vui lòng nhập vào tên lớp"
     }
     if (!values.avatar) {
-      err.avatar = "vui lòng thêm ảnh"
+      err.avatar = "Vui lòng thêm ảnh"
     }
     return err
   }
@@ -156,12 +152,13 @@ export default function StudentsManage() {
         </tbody>
       </table>
       <div className="pagination">
-        <Link to={`/page/${page === 1 ? page = 1 : page - 1}`} className='child-pagi' style={{ border: 'none' }}>&laquo;</Link>
-        {numOfPage.map((item, index) => {
-          return <Pagination params={params.page} value={item} key={index} />
-        })}
-        <Link to={`/page/${page === numOfPage.length ? page = numOfPage.length : page + 1}`} className='child-pagi' style={{ border: 'none' }}>&raquo;</Link>
+        <Pagination 
+          numOfPage={numOfPage}
+          pagination={pagination}
+          onPageChange={handlePageChange}
+        ></Pagination>
       </div>
+      {activeForm && 
       <FormFeature
         title={editingStudent && editingStudent._id ? "Update Học Sinh" : "Add Học Sinh"}
         visible={activeForm}
@@ -174,12 +171,13 @@ export default function StudentsManage() {
         previewImage={previewImage}
         setPreviewImage={setPreviewImage}
         setErrors={setErrors}
-        Errors={errors}
+        errors={errors}
         editingStudent={editingStudent}
         setEditingStudent={setEditingStudent}
         handleSubmit={editingStudent && editingStudent._id ? handleUpdateSubmit : handleAddSubmit}
       >
       </FormFeature>
+      }
     </div>
   )
 }

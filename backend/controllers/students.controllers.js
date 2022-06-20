@@ -1,20 +1,17 @@
 const Students = require('../models/students.modal')
-const pageSize = 2
+
 class StudentsControllers {
     // GET students
     async getStudents(req, res) {
         try {
-            let page = Number(req.query.page)
-            if(page){
-            let skipPage = (page-1)*pageSize
-            const students = await Students.find({})
-            .skip(skipPage)
-            .limit(pageSize)
-            res.status(200).json(students.reverse())
-            }else{
-                const students = await Students.find({})
-                res.status(200).json(students)
-            }
+            const page = req.query.page *1 
+            const limit = req.query.limit *1 
+            let skip = limit * (page-1)
+            const countStudent = await Students.countDocuments()
+            const student = await Students.find()
+            .skip(skip)
+            .limit(limit)
+            res.status(200).json({student,countStudent})
         } catch (err) {
             res.status(500).send(err)
         }
@@ -31,6 +28,7 @@ class StudentsControllers {
     //POST add student
     async postStudent(req, res) {
         try {
+            console.log(req.body);
             const student = await Students.create({
                 firstname: req.body.firstname,
                 lastname: req.body.lastname,
@@ -51,6 +49,7 @@ class StudentsControllers {
             age: req.body.age,
             classname: req.body.classname,
         }
+        console.log(req.body._id)
         if (typeof (req.file) != "undefined") value.avatar = req.file.filename
         Students
             .findByIdAndUpdate(req.body._id, value)

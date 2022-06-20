@@ -1,18 +1,14 @@
 import React from "react"
-import Header from "./components/Header";
+import Header from "./components/header/Header";
 import './App.css'
 import 'antd/dist/antd.min.css'
-import Footer from "./components/Footer";
-import StudentsManage from "./studentsManage/StudentsManage";
-import { Route, Routes } from "react-router-dom";
+import Footer from "./components/footer/Footer";
+import StudentsManage from './pages/studentsManage/StudentsManage'
 function App() {
   return (
     <div id="main">
       <Header/>
-      <Routes>
-        <Route index element={<StudentsManage/>}></Route>
-        <Route path="/page/:page" element={<StudentsManage/>}></Route>
-      </Routes>
+      <StudentsManage/>
       <Footer/>
     </div>
   );

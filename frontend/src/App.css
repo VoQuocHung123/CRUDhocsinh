@@ -93,6 +93,7 @@
   height: 30px;
   border: 1px solid #13b1e1;
   padding: 10px;
+  margin-bottom: 5px;
 }
 .btn-add-form{
   width: 100%;
@@ -129,27 +130,32 @@ thead{
 .pagination {
   display: block;
   width: 100%;
-  margin: 50px 270px 0px;
+  margin: 20px 130px;
 }
 
-.pagination .child-pagi {
+.pagination a {
   color: black;
   float: left;
   padding: 8px 16px;
   text-decoration: none;
+  margin: 0px 5px;
   border: 1px solid #13b1e1;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
-.pagination .child-pagi.active {
+.pagination a.active {
+  border-radius: 10px;
   background-color: #4CAF50;
   color: white;
-  border-radius: 5px;
 }
 
-.pagination .child-pagi:hover:not(.active) {
+.pagination a:hover:not(.active) {
   background-color: #ddd;
-  border-radius: 5px;
+  border-radius: 10px;
+}
+::placeholder{
+  color: red;
+  font-size: 14px;
 }
 @keyframes modalgo {
   from{

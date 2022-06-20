@@ -4,8 +4,8 @@ const studentApi = {
         const url = '/students'
         return axiosClient.get(url)
     },
-    getbyPage:(params) =>{
-        const url = `/students?page=${params}`
+    getbyPage:(query) =>{
+        const url = `/students?${query}`
         return axiosClient.get(url)
     },
     getById: (id) => {
